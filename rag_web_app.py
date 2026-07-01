@@ -57,18 +57,22 @@ with st.sidebar:
 st.title("📑 실시간 RAG 문서 업로더 & 챗봇")
 st.write("문서를 업로드하면 실시간으로 OCR 처리 후 그 기반으로 챗봇이 자동 생성됩니다.")
 
-# 1. secrets.toml 파일에서 보안 자격 증명 로드 (Azure OCR & Azure OpenAI)
+# 1. secrets.toml(로컬)과 환경변수/HuggingFace Secrets(배포용 플랫 구조) 모두 호환되도록 자격 증명 로드
 try:
-    ocr_endpoint = st.secrets["azure_ocr"]["endpoint"]
-    ocr_key = st.secrets["azure_ocr"]["key"]
+    # 로컬 secrets.toml (계층형) 또는 배포 환경변수 (플랫형) 지원
+    ocr_endpoint = st.secrets.get("AZURE_OCR_ENDPOINT") or st.secrets.get("azure_ocr", {}).get("endpoint")
+    ocr_key = st.secrets.get("AZURE_OCR_KEY") or st.secrets.get("azure_ocr", {}).get("key")
     
-    llm_endpoint = st.secrets["azure_openai"]["endpoint"]
-    llm_key = st.secrets["azure_openai"]["key"]
-    llm_deployment = st.secrets["azure_openai"]["deployment_name"]
-    llm_api_version = st.secrets["azure_openai"]["api_version"]
+    llm_endpoint = st.secrets.get("AZURE_OPENAI_ENDPOINT") or st.secrets.get("azure_openai", {}).get("endpoint")
+    llm_key = st.secrets.get("AZURE_OPENAI_KEY") or st.secrets.get("azure_openai", {}).get("key")
+    llm_deployment = st.secrets.get("AZURE_OPENAI_DEPLOYMENT_NAME") or st.secrets.get("azure_openai", {}).get("deployment_name")
+    llm_api_version = st.secrets.get("AZURE_OPENAI_API_VERSION") or st.secrets.get("azure_openai", {}).get("api_version") or "2024-02-01"
     
-    # 템플릿 안내 문구가 그대로 있으면 설정 오류로 판단
-    if "여기에" in llm_endpoint or "여기에" in llm_key or "여기에" in llm_deployment:
+    # 설정 누락 체크
+    if not ocr_endpoint or not ocr_key or not llm_endpoint or not llm_key or not llm_deployment:
+        has_config = False
+    # 플레이스홀더 템플릿 글자가 그대로 들어가 있는 경우도 세팅 오류 처리
+    elif "여기에" in llm_endpoint or "여기에" in llm_key:
         has_config = False
     else:
         has_config = True
@@ -76,8 +80,9 @@ except Exception:
     has_config = False
 
 if not has_config:
-    st.error("⚠️ [설정 오류] `.streamlit/secrets.toml` 파일에 Azure OCR 및 Azure OpenAI 설정 정보를 올바르게 입력해 주세요.")
-    st.info("비밀번호 및 자격 증명 설정 파일 링크: [.streamlit/secrets.toml](file:///C:/dev/.streamlit/secrets.toml) 파일을 열어서 실제 키를 채워 넣으시면 바로 작동합니다.")
+    st.error("⚠️ [설정 오류] API 설정 정보가 비어 있거나 올바르지 않습니다. 로컬 secrets.toml 또는 배포용 Secrets 변수 설정을 완료해 주세요.")
+    st.info("로컬 개발 시: [.streamlit/secrets.toml](file:///C:/dev/.streamlit/secrets.toml) 파일을 작성하세요.\n\n"
+            "클라우드(Hugging Face) 배포 시: Settings -> Variables and secrets 탭에 Secrets 변수들을 등록하세요.")
     st.stop()
 
 # 2. 실시간 파일 업로더 생성
