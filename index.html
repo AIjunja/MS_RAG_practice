@@ -79,25 +79,53 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .app-status {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+        }
+
+        .membership-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            padding: 0.4rem 0.8rem;
-            border-radius: 2rem;
         }
 
-        .app-status.success i {
-            color: var(--success-color);
+        .membership-badge.free {
+            color: var(--text-secondary);
         }
 
-        .app-status.loading i {
-            color: var(--accent-color);
-            animation: spin 1s linear infinite;
+        .membership-badge.pro {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.2);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+        }
+
+        .upgrade-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #080b11;
+            border: none;
+            padding: 0.45rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         }
 
         /* Split View Layout */
@@ -504,6 +532,7 @@
             color: var(--text-secondary);
             text-align: center;
             height: 100%;
+            padding: 2rem;
         }
 
         .empty-state i {
@@ -515,9 +544,161 @@
             margin-top: 0.5rem;
         }
 
+        /* Pro Upgrade Lock Overlay for features */
+        .pro-lock-overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .pro-lock-overlay i {
+            font-size: 3.5rem;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+        .pro-lock-overlay h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .pro-lock-overlay p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        /* Modal Overlay (Premium Code entry) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: #111827;
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            width: 450px;
+            max-width: 90%;
+            padding: 2.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close-modal-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            text-align: center;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .submit-code-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #080b11;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-code-btn:hover {
+            opacity: 0.9;
+        }
+
+        .pay-link-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+        }
+
+        .pay-link-info a {
+            color: #fbbf24;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -530,7 +711,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Layout resizer (Toggle PDF width) */
+        /* Toggle Button Layout */
         .toggle-viewer-btn {
             background: transparent;
             border: none;
@@ -558,9 +739,17 @@
             <i class="fa-solid fa-brain"></i>
             <h1>Linnk AI RAG</h1>
         </div>
-        <div class="app-status" id="app-status">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>상태: 대기 중</span>
+        <div class="header-actions">
+            <div class="membership-badge free" id="membership-badge">
+                <i class="fa-solid fa-seedling"></i> Free Plan (1일 1회 분석)
+            </div>
+            <button class="upgrade-btn" id="open-upgrade-btn">
+                <i class="fa-solid fa-bolt"></i> Pro 인증하기
+            </button>
+            <div class="app-status" id="app-status">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>상태: 대기 중</span>
+            </div>
         </div>
     </header>
 
@@ -634,25 +823,28 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Mindmap -->
+            <!-- Tab Content: Mindmap (Locked for Free Users) -->
             <div class="tab-content" id="tab-mindmap">
+                <!-- Pro Lock Overlay -->
+                <div class="pro-lock-overlay" id="mindmap-lock" style="display: none;">
+                    <i class="fa-solid fa-lock"></i>
+                    <h3>구조 마인드맵 시각화</h3>
+                    <p>마인드맵 시각화 기능은 Pro 요금제 전용 기능입니다. 결제 후 발급받은 코드를 입력해 주세요.</p>
+                    <button class="action-btn" onclick="openUpgradeModal()"><i class="fa-solid fa-bolt" style="color:#fbbf24"></i> Pro 업그레이드</button>
+                </div>
+
                 <div class="mindmap-container" id="mindmap-container">
-                    <!-- Actions -->
                     <div class="mindmap-actions" id="mindmap-actions" style="display: none;">
                         <button class="action-btn" onclick="generateMindmap()">
                             <i class="fa-solid fa-arrows-rotate"></i> 다시 생성
                         </button>
                     </div>
-
-                    <!-- Render Area -->
                     <div class="mermaid-wrapper">
                         <div class="mermaid" id="mermaid-render-area"></div>
                     </div>
-
-                    <!-- Empty State -->
                     <div class="empty-state" id="mindmap-empty">
                         <i class="fa-solid fa-circle-nodes"></i>
-                        <p>문서 업로드 완료 시, 내용을 계층 구조의 마인드맵으로 시각화합니다.</p>
+                        <p>문서 요약 분석 완료 후 마인드맵을 시각화할 수 있습니다.</p>
                         <button class="action-btn" id="mindmap-gen-btn" disabled onclick="generateMindmap()">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> 마인드맵 생성
                         </button>
@@ -660,26 +852,54 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Report -->
+            <!-- Tab Content: Report (Locked for Free Users) -->
             <div class="tab-content" id="tab-report">
+                <!-- Pro Lock Overlay -->
+                <div class="pro-lock-overlay" id="report-lock" style="display: none;">
+                    <i class="fa-solid fa-lock"></i>
+                    <h3>정형 보고서 요약</h3>
+                    <p>비즈니스 규격의 전문적인 보고서 요약본 생성은 Pro 요금제 전용 기능입니다.</p>
+                    <button class="action-btn" onclick="openUpgradeModal()"><i class="fa-solid fa-bolt" style="color:#fbbf24"></i> Pro 업그레이드</button>
+                </div>
+
                 <div class="report-container" id="report-container">
-                    
-                    <!-- Empty State -->
                     <div class="empty-state" id="report-empty">
                         <i class="fa-solid fa-file-invoice"></i>
-                        <p>문서 정보를 구조화하여 전문적인 보고서 양식으로 요약 생성합니다.</p>
+                        <p>문서의 핵심 정보들을 기반으로 비즈니스 보고서 초안을 빌드합니다.</p>
                         <button class="action-btn" id="report-gen-btn" disabled onclick="generateReport()">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> 보고서 초안 생성
                         </button>
                     </div>
-
-                    <!-- Report Output -->
                     <div class="report-view" id="report-view" style="display: none;"></div>
                 </div>
             </div>
 
         </div>
 
+    </div>
+
+    <!-- Upgrade / Verification Modal -->
+    <div class="modal-overlay" id="upgrade-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>⚡ Pro 라이선스 인증</h2>
+                <button class="close-modal-btn" onclick="closeUpgradeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="pay-link-info">
+                <strong>💡 Pro 패스코드 발급 안내:</strong><br>
+                아래 결제 링크를 통해 **일일 이용권(1,900원)** 또는 **월 무제한 구독(5,900원)** 결제를 완료하시면 등록하신 이메일/문자로 즉시 인증 코드가 발급됩니다.<br><br>
+                👉 <a href="https://toss.me/yourlink" target="_blank">토스페이로 빠르게 결제하기</a> (1분 소요)<br>
+                👉 <a href="https://buy.stripe.com/mock-link" target="_blank">신용카드로 결제하기 (Stripe)</a>
+            </div>
+
+            <div class="form-group">
+                <label>발급받은 인증 코드(Passcode) 입력</label>
+                <input type="text" id="passcode-input" placeholder="예: RAGPRO99">
+            </div>
+
+            <button class="submit-code-btn" onclick="verifyPasscode()">라이선스 적용하기</button>
+        </div>
     </div>
 
     <script>
@@ -691,6 +911,12 @@
         let chatHistory = [];
         let mindmapGenerated = false;
         let reportGenerated = false;
+        
+        // Monetization limits
+        let isPro = localStorage.getItem('isProUser') === 'true';
+        let uploadCount = parseInt(localStorage.getItem('userUploadCount') || '0');
+        let chatCount = 0;
+        const FREE_CHAT_LIMIT = 3;
 
         // UI Selectors
         const workspace = document.getElementById('workspace');
@@ -709,10 +935,72 @@
         const mindmapEmpty = document.getElementById('mindmap-empty');
         const mindmapActions = document.getElementById('mindmap-actions');
         const mermaidRenderArea = document.getElementById('mermaid-render-area');
+        const mindmapLock = document.getElementById('mindmap-lock');
 
         const reportGenBtn = document.getElementById('report-gen-btn');
         const reportEmpty = document.getElementById('report-empty');
         const reportView = document.getElementById('report-view');
+        const reportLock = document.getElementById('report-lock');
+
+        // Membership Badge and Modal Controls
+        const membershipBadge = document.getElementById('membership-badge');
+        const openUpgradeBtn = document.getElementById('open-upgrade-btn');
+        const upgradeModal = document.getElementById('upgrade-modal');
+        const passcodeInput = document.getElementById('passcode-input');
+
+        // Apply Premium State to UI
+        const applyMembershipStatus = () => {
+            if (isPro) {
+                membershipBadge.className = "membership-badge pro";
+                membershipBadge.innerHTML = `<i class="fa-solid fa-crown"></i> Pro Premium Active`;
+                openUpgradeBtn.style.display = "none";
+                
+                // Remove feature locks
+                mindmapLock.style.display = "none";
+                reportLock.style.display = "none";
+            } else {
+                membershipBadge.className = "membership-badge free";
+                membershipBadge.innerHTML = `<i class="fa-solid fa-seedling"></i> Free Plan (1일 1회 분석)`;
+                openUpgradeBtn.style.display = "block";
+                
+                // Show locks
+                mindmapLock.style.display = "flex";
+                reportLock.style.display = "flex";
+            }
+        };
+
+        // Modal triggers
+        const openUpgradeModal = () => { upgradeModal.style.display = 'flex'; };
+        const closeUpgradeModal = () => { upgradeModal.style.display = 'none'; };
+        openUpgradeBtn.addEventListener('click', openUpgradeModal);
+        upgradeModal.addEventListener('click', (e) => { if(e.target === upgradeModal) closeUpgradeModal(); });
+
+        // Verify Passcode API Call
+        const verifyPasscode = async () => {
+            const code = passcodeInput.value.trim();
+            if (!code) return alert("코드를 입력해 주세요.");
+
+            try {
+                const response = await fetch("/api/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: code })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.valid) {
+                    isPro = true;
+                    localStorage.setItem('isProUser', 'true');
+                    applyMembershipStatus();
+                    closeUpgradeModal();
+                    alert(data.message);
+                } else {
+                    alert(data.message || "유효하지 않은 라이선스 코드입니다.");
+                }
+            } catch (err) {
+                alert(`인증 통신 오류: ${err.message}`);
+            }
+        };
 
         // Toggle PDF View
         const togglePdfViewer = () => {
@@ -721,7 +1009,6 @@
 
         // Tab Switching Logic
         const switchTab = (evt, tabId) => {
-            // Remove active classes
             const tablinks = document.getElementsByClassName("tab-btn");
             for (let i = 0; i < tablinks.length; i++) {
                 tablinks[i].classList.remove("active");
@@ -731,48 +1018,39 @@
                 tabcontent[i].classList.remove("active");
             }
 
-            // Add active class
             evt.currentTarget.classList.add("active");
             document.getElementById(tabId).classList.add("active");
 
-            // 만약 PDF 뷰어가 닫혀있고 마인드맵이나 보고서 탭을 열면, 자동으로 PDF 뷰어를 열어 듀얼 모드로 만들어 줌
             if (tabId !== 'tab-chat' && workspace.classList.contains('collapsed-pdf')) {
                 workspace.classList.remove('collapsed-pdf');
             }
         };
 
-        // File Uploader Handling
+        // File Uploader Drag/Drop
         dropZone.addEventListener('click', () => fileInput.click());
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
         });
-
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
         });
 
-        // OCR Handler
+        // OCR Handler with upload limits
         const handleFile = async (file) => {
+            // 무료 사용자 업로드 한도 검증 (하루 1회 제한)
+            if (!isPro && uploadCount >= 1) {
+                alert("⚠️ 무료 체험 1일 1회 분석 한도를 초과했습니다. Pro 라이선스를 구매해 제한을 해제하세요!");
+                openUpgradeModal();
+                return;
+            }
+
             appStatus.className = "app-status loading";
             appStatus.innerHTML = `<i class="fa-solid fa-circle-notch"></i> <span>상태: 문서 OCR 분석 중...</span>`;
             
-            // PDF 원본 뷰어 띄우기 (URL 생성)
             if (file.type === "application/pdf") {
                 const fileURL = URL.createObjectURL(file);
                 pdfViewer.src = fileURL;
@@ -783,7 +1061,6 @@
             try {
                 const fileBytes = await file.arrayBuffer();
 
-                // Call secure Cloudflare Pages Function (Azure OCR)
                 const ocrResponse = await fetch("/api/ocr", {
                     method: 'POST',
                     body: fileBytes
@@ -791,26 +1068,27 @@
 
                 const ocrResult = await ocrResponse.json();
 
-                if (!ocrResponse.ok) {
-                    throw new Error(ocrResult.error || `OCR 제출 실패 (코드: ${ocrResponse.status})`);
-                }
+                if (!ocrResponse.ok) throw new Error(ocrResult.error || "OCR 실패");
 
                 documentText = ocrResult.content || "";
 
-                // Reset Status
+                // Increment upload count only on successful parse
+                if (!isPro) {
+                    uploadCount++;
+                    localStorage.setItem('userUploadCount', uploadCount.toString());
+                }
+
                 appStatus.className = "app-status success";
                 appStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>상태: 분석 완료 (${documentText.length} 자)</span>`;
 
-                // Enable Chat Inputs
                 chatInput.disabled = false;
                 sendBtn.disabled = false;
                 suggestionsArea.style.display = "flex";
 
-                // Enable Tab Generation Buttons
                 mindmapGenBtn.disabled = false;
                 reportGenBtn.disabled = false;
 
-                addMessage("assistant", `문서 적재 및 OCR 분석이 완료되었습니다. 이제 다음 작업이 가능합니다:\n1. 💬 챗봇 질답\n2. 🌿 구조 마인드맵 시각화 생성\n3. 📋 정형 보고서 초안 생성`);
+                addMessage("assistant", `문서 분석이 완료되었습니다! 챗봇에 문서 내용을 질문해 보세요.`);
 
             } catch (err) {
                 console.error(err);
@@ -820,30 +1098,14 @@
             }
         };
 
-        // Chat UI helpers
-        const addMessage = (role, text) => {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${role}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = role === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.innerText = text;
-            
-            msgDiv.appendChild(avatar);
-            msgDiv.appendChild(bubble);
-            
-            messagesContainer.appendChild(msgDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        };
-
-        // LLM Request Proxy Call
+        // Chat UI & Logic with Chat limits
         const askQuestion = async (userQuery) => {
-            if (!documentText) {
-                alert("먼저 파일을 업로드해 주세요.");
+            if (!documentText) return alert("먼저 파일을 업로드해 주세요.");
+
+            // 무료 유저 질문 횟수 제한 검증
+            if (!isPro && chatCount >= FREE_CHAT_LIMIT) {
+                alert("⚠️ 무료 버전은 질문 3회만 가능합니다. 무제한 대화와 마인드맵/보고서 생성을 위해 Pro로 업그레이드해 보세요!");
+                openUpgradeModal();
                 return;
             }
 
@@ -875,34 +1137,28 @@
 [참조 문서 내용]
 ${documentText}`;
 
-                const messagesPayload = [
-                    { role: "system", content: systemPrompt }
-                ];
-                
+                const messagesPayload = [{ role: "system", content: systemPrompt }];
                 const lastHistory = chatHistory.slice(-6);
                 lastHistory.forEach(h => messagesPayload.push(h));
 
                 const response = await fetch("/api/chat", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        messages: messagesPayload
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: messagesPayload })
                 });
 
                 const resData = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(resData.error || `AI 통신 에러 (코드: ${response.status})`);
-                }
+                if (!response.ok) throw new Error(resData.error || "AI 호출 오류");
 
                 const aiAnswer = resData.choices[0].message.content;
-
                 messagesContainer.removeChild(loadingMsgDiv);
                 addMessage("assistant", aiAnswer);
                 chatHistory.push({ role: "assistant", content: aiAnswer });
+
+                // Increment Free Chat Count
+                if (!isPro) {
+                    chatCount++;
+                }
 
             } catch (err) {
                 console.error(err);
@@ -915,7 +1171,6 @@ ${documentText}`;
             }
         };
 
-        // Suggested Question Handler
         window.askSuggestion = (fullText) => {
             const cleanText = fullText.replace(/^[^\w가-힣]+/, "").trim();
             askQuestion(cleanText);
@@ -934,28 +1189,23 @@ ${documentText}`;
             }
         });
 
-        // 🌿 Mindmap Generation (Uses Mermaid.js syntax)
+        // 🌿 Mindmap Generation
         const generateMindmap = async () => {
+            if (!isPro) return openUpgradeModal();
             if (!documentText) return;
 
-            mindmapEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>문서 요약 마인드맵 분석 및 그리는 중...</p>`;
+            mindmapEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>구조 마인드맵 그리는 중...</p>`;
             mindmapGenBtn.disabled = true;
 
             try {
                 const mindmapPrompt = `제공된 문서 내용을 기반으로 핵심 정보를 구조화한 Mermaid.js 마인드맵(mindmap) 코드를 생성해 주세요.
-반드시 마인드맵 코드만 출력해야 하며, 다른 텍스트 설명이나 마크다운 펜스(\`\`\`) 등은 일절 적지 마세요.
+반드시 마인드맵 코드만 출력해야 하며, 다른 설명글이나 마크다운 펜스 등은 일절 적지 마세요.
 
 [문서 내용]
 ${documentText}
 
-[출력 양식 예시]
 mindmap
-  root((핵심 주제))
-    핵심주제1
-      세부개념1_1
-      세부개념1_2
-    핵심주제2
-      세부개념2_1`;
+  root((핵심 주제))`;
 
                 const response = await fetch("/api/chat", {
                     method: 'POST',
@@ -972,15 +1222,11 @@ mindmap
                 if (!response.ok) throw new Error(resData.error);
 
                 let rawMermaidCode = resData.choices[0].message.content.trim();
-                
-                // 마크다운 백틱 문법(\`\`\`mermaid)이 씌워져서 오는 경우를 대비한 가공 처리
                 rawMermaidCode = rawMermaidCode.replace(/```mermaid/gi, "").replace(/```/g, "").trim();
 
-                // Clean Mindmap Render Area
                 mermaidRenderArea.innerHTML = "";
                 mermaidRenderArea.removeAttribute('data-processed');
                 
-                // Render with Mermaid Engine
                 const { svg } = await mermaid.render('mindmap-svg', rawMermaidCode);
                 mermaidRenderArea.innerHTML = svg;
 
@@ -998,20 +1244,18 @@ mindmap
             }
         };
 
-        // 📋 Professional Report Generation (Uses Marked.js to parse Markdown response)
+        // 📋 Report Generation
         const generateReport = async () => {
+            if (!isPro) return openUpgradeModal();
             if (!documentText) return;
 
-            reportEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>문서를 심층 요약하여 격식 있는 보고서로 정밀 구성하는 중...</p>`;
+            reportEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>보고서 생성 중...</p>`;
             reportGenBtn.disabled = true;
 
             try {
                 const reportPrompt = `제공된 문서의 내용을 격식 있고 전문적인 비즈니스 보고서(Markdown 형식)로 완전하게 재구성해 주세요.
-
-[요구사항]
-- 1. 개요 및 목적, 2. 핵심 분석 요약, 3. 결론 및 향후 전망 순으로 자세하게 작성해 주세요.
-- 가독성이 높도록 리스트, 표(Table) 또는 인용구(Blockquote) 문법을 적극 활용해 주세요.
-- 반드시 한국어로 논리 정연하게 작성해 주세요.
+- 1. 개요 및 목적, 2. 핵심 분석 요약, 3. 결론 및 향후 전망 순으로 작성해 주세요.
+- 표나 리스트를 적극 활용해 주세요.
 
 [문서 내용]
 ${documentText}`;
@@ -1031,8 +1275,6 @@ ${documentText}`;
                 if (!response.ok) throw new Error(resData.error);
 
                 const rawReportMarkdown = resData.choices[0].message.content;
-
-                // Parse markdown into HTML and inject
                 reportView.innerHTML = marked.parse(rawReportMarkdown);
                 
                 reportEmpty.style.display = "none";
@@ -1048,6 +1290,9 @@ ${documentText}`;
                 `;
             }
         };
+
+        // Initialize Membership UI on page load
+        applyMembershipStatus();
     </script>
 </body>
 </html>
