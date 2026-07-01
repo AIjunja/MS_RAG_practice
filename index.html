@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linnk Style - 실시간 AI RAG 분석 플랫폼</title>
+    <title>ATS Resume Matcher - AI 기반 이력서 합격 치트키</title>
     <!-- Google Fonts & Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
     
     <style>
         :root {
-            --bg-color: #080b11;
-            --panel-bg: rgba(17, 24, 39, 0.6);
+            --bg-color: #060913;
+            --panel-bg: rgba(17, 24, 39, 0.65);
             --border-color: rgba(255, 255, 255, 0.06);
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
@@ -23,7 +23,7 @@
             --accent-hover: #4f46e5;
             --success-color: #10b981;
             --danger-color: #ef4444;
-            --sidebar-width: 450px;
+            --warning-color: #f59e0b;
         }
 
         * {
@@ -42,8 +42,8 @@
             flex-direction: column;
             overflow: hidden;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 40%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 40%);
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.12) 0px, transparent 40%);
         }
 
         /* Header Styling */
@@ -51,9 +51,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.5rem;
+            padding: 0.85rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(8, 11, 17, 0.7);
+            background: rgba(6, 9, 19, 0.7);
             backdrop-filter: blur(12px);
             z-index: 10;
         }
@@ -61,17 +61,17 @@
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.65rem;
         }
 
         .logo-area i {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             color: var(--accent-color);
             text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
         }
 
         .logo-area h1 {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
             letter-spacing: -0.025em;
             background: linear-gradient(to right, #6366f1, #a855f7);
@@ -105,16 +105,16 @@
             color: #fbbf24;
             background: rgba(251, 191, 36, 0.1);
             border-color: rgba(251, 191, 36, 0.2);
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.15);
         }
 
         .upgrade-btn {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #080b11;
             border: none;
-            padding: 0.45rem 1rem;
-            border-radius: 0.75rem;
-            font-size: 0.85rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 0.65rem;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
@@ -128,124 +128,127 @@
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         }
 
-        /* Split View Layout */
+        /* Workspace Panels */
         .workspace {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             flex: 1;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 55px);
             overflow: hidden;
         }
 
-        /* Left Side: Document / PDF Viewer Panel */
-        .doc-panel {
-            width: var(--sidebar-width);
-            border-right: 1px solid var(--border-color);
-            background: rgba(10, 15, 26, 0.4);
-            backdrop-filter: blur(20px);
+        /* Panels Shared Styling */
+        .panel {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: width 0.3s ease;
+            background: rgba(10, 15, 26, 0.2);
+        }
+
+        .left-panel {
+            border-right: 1px solid var(--border-color);
         }
 
         .panel-header {
-            padding: 1rem;
+            padding: 0.85rem 1.25rem;
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            background: rgba(10, 15, 26, 0.4);
+            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .viewer-container {
+        .panel-content {
             flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            background: rgba(0, 0, 0, 0.3);
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        /* Initial Upload Screen inside Viewer */
-        .upload-placeholder {
-            padding: 2rem;
+        /* File Upload Areas */
+        .upload-box {
+            border: 2px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            width: 80%;
-            border: 2px dashed rgba(255, 255, 255, 0.12);
-            border-radius: 1rem;
-            transition: all 0.2s ease;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.01);
+            position: relative;
         }
 
-        .upload-placeholder:hover {
+        .upload-box:hover, .upload-box.dragover {
             border-color: var(--accent-color);
             background: rgba(99, 102, 241, 0.05);
         }
 
-        .upload-placeholder i {
-            font-size: 2.5rem;
+        .upload-box i {
+            font-size: 2.25rem;
             color: var(--text-secondary);
         }
 
-        .upload-placeholder h4 {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-primary);
+        .upload-box:hover i {
+            color: var(--accent-color);
         }
 
-        .upload-placeholder p {
+        .upload-box h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .upload-box p {
             font-size: 0.75rem;
             color: var(--text-secondary);
-            line-height: 1.4;
         }
 
-        #file-input {
+        .upload-box span {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* File Loaded Viewer Screen */
+        .file-viewer-wrapper {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            overflow: hidden;
             display: none;
+            position: relative;
+            background: #000;
         }
 
-        /* Native PDF Viewer Iframe */
-        #pdf-viewer {
+        .file-viewer-wrapper iframe {
             width: 100%;
             height: 100%;
             border: none;
-            display: none;
         }
 
-        /* Right Side: Analysis & Workspace Panel */
-        .analysis-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: transparent;
-        }
-
-        /* Tab bar style */
+        /* Tabs on Right Panel */
         .tab-bar {
             display: flex;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(10, 15, 26, 0.5);
-            padding: 0 1rem;
+            background: rgba(10, 15, 26, 0.4);
         }
 
         .tab-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 1rem 1.5rem;
-            font-size: 0.9rem;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             position: relative;
             transition: color 0.2s ease;
         }
@@ -267,14 +270,14 @@
             width: 100%;
             height: 2px;
             background-color: var(--accent-color);
-            box-shadow: 0 -2px 10px rgba(99, 102, 241, 0.5);
         }
 
-        /* Tab Content Panel */
+        /* Right Tabs Content Panels */
         .tab-content {
             flex: 1;
             display: none;
-            overflow: hidden;
+            overflow-y: auto;
+            padding: 1.5rem;
             position: relative;
         }
 
@@ -283,246 +286,40 @@
             flex-direction: column;
         }
 
-        /* Chat Tab Content */
-        .chat-container {
-            flex: 1;
+        /* Match Score Section */
+        .score-circle-container {
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 0;
         }
 
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .message {
-            display: flex;
-            gap: 1rem;
-            max-width: 80%;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message.assistant {
-            align-self: flex-start;
-        }
-
-        .avatar {
-            width: 2rem;
-            height: 2rem;
+        .score-circle {
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
-        .message.user .avatar {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .message.assistant .avatar {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            color: white;
-        }
-
-        .bubble {
-            padding: 0.75rem 1.15rem;
-            border-radius: 1rem;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            word-break: break-word;
-        }
-
-        .message.user .bubble {
-            background: var(--accent-color);
-            color: white;
-            border-top-right-radius: 0.2rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-        }
-
-        .message.assistant .bubble {
-            background: var(--panel-bg);
-            color: var(--text-primary);
-            border-top-left-radius: 0.2rem;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-        }
-
-        .suggestions {
-            padding: 0.5rem 2rem;
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .suggestion-chip {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.85rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .suggestion-chip:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--text-primary);
-            border-color: var(--accent-color);
-        }
-
-        .input-container {
-            padding: 1.25rem 2rem;
-            background: transparent;
-        }
-
-        .input-wrapper {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            padding: 0.4rem 0.6rem 0.4rem 1rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            padding: 0.4rem 0;
-        }
-
-        .send-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .send-btn:hover {
-            background: var(--accent-hover);
-        }
-
-        .send-btn:disabled {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        /* Mindmap Tab Content */
-        .mindmap-container {
-            flex: 1;
-            overflow: auto;
-            padding: 2rem;
+            border: 8px solid var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.15);
+            font-weight: 700;
             position: relative;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
         }
 
-        .mindmap-actions {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            z-index: 5;
-            display: flex;
-            gap: 0.5rem;
+        .score-circle .number {
+            font-size: 2.25rem;
+            color: var(--accent-color);
         }
 
-        .action-btn {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
+        .score-circle .label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
         }
 
-        .action-btn:hover {
-            border-color: var(--accent-color);
-            background: rgba(99, 102, 241, 0.05);
-        }
-
-        .mermaid-wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-        }
-
-        .mermaid svg {
-            max-width: 100% !important;
-            height: auto !important;
-        }
-
-        /* Report Tab Content */
-        .report-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2.5rem;
-            background: rgba(10, 15, 26, 0.1);
-        }
-
-        .report-view {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 1.25rem;
-            padding: 2.5rem;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            line-height: 1.7;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-        }
-
-        /* Markdown elements inside report */
-        .report-view h1 { font-size: 1.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-        .report-view h2 { font-size: 1.35rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--accent-color); }
-        .report-view h3 { font-size: 1.1rem; margin-top: 1rem; margin-bottom: 0.5rem; }
-        .report-view p { margin-bottom: 1rem; color: #d1d5db; }
-        .report-view ul, .report-view ol { margin-left: 1.5rem; margin-bottom: 1rem; }
-        .report-view li { margin-bottom: 0.35rem; color: #d1d5db; }
-        .report-view blockquote { border-left: 3px solid var(--accent-color); padding-left: 1rem; margin: 1rem 0; color: var(--text-secondary); font-style: italic; }
-
-        /* General placeholder for Empty states */
+        /* General Empty State */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -532,54 +329,125 @@
             color: var(--text-secondary);
             text-align: center;
             height: 100%;
-            padding: 2rem;
+            padding: 3rem;
         }
 
         .empty-state i {
             font-size: 3rem;
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
-        .empty-state button {
-            margin-top: 0.5rem;
-        }
-
-        /* Pro Upgrade Lock Overlay for features */
-        .pro-lock-overlay {
+        /* Analyse trigger button */
+        .analyse-trigger-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: 100%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
-            background: rgba(11, 15, 25, 0.85);
-            backdrop-filter: blur(8px);
+            gap: 0.5rem;
+            transition: background 0.2s ease;
+        }
+
+        .analyse-trigger-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .analyse-trigger-btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* ATS Report Custom Styling */
+        .report-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .report-card h4 {
+            margin-bottom: 0.75rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        /* Markdown report styles */
+        .marked-report h3 { font-size: 1.05rem; margin-top: 1rem; color: var(--accent-color); }
+        .marked-report p { margin-bottom: 0.75rem; font-size: 0.875rem; color: #d1d5db; line-height: 1.6; }
+        .marked-report ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        .marked-report li { margin-bottom: 0.25rem; font-size: 0.875rem; color: #d1d5db; }
+        .marked-report blockquote { border-left: 3px solid var(--accent-color); padding-left: 0.75rem; color: var(--text-secondary); font-style: italic; margin: 0.5rem 0;}
+
+        /* Mermaid Graph Container */
+        .mermaid-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        /* Pro Lock Overlays */
+        .pro-lock {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10;
+            background: rgba(6, 9, 19, 0.92);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            z-index: 20;
             color: var(--text-primary);
             text-align: center;
             padding: 2rem;
         }
 
-        .pro-lock-overlay i {
-            font-size: 3.5rem;
+        .pro-lock i {
+            font-size: 3rem;
             color: #fbbf24;
-            text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
         }
 
-        .pro-lock-overlay h3 {
-            font-size: 1.35rem;
+        .pro-lock h3 {
+            font-size: 1.2rem;
             font-weight: 700;
         }
 
-        .pro-lock-overlay p {
-            font-size: 0.9rem;
+        .pro-lock p {
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            max-width: 320px;
+            max-width: 280px;
             line-height: 1.5;
+        }
+
+        .pro-lock button {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #080b11;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
         /* Modal Overlay (Premium Code entry) */
@@ -710,25 +578,6 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-
-        /* Toggle Button Layout */
-        .toggle-viewer-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-        }
-
-        .toggle-viewer-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .workspace.collapsed-pdf .doc-panel {
-            width: 0;
-            border: none;
-        }
     </style>
 </head>
 <body>
@@ -736,8 +585,8 @@
     <!-- Header -->
     <header>
         <div class="logo-area">
-            <i class="fa-solid fa-brain"></i>
-            <h1>Linnk AI RAG</h1>
+            <i class="fa-solid fa-file-contract"></i>
+            <h1>ATS Resume Matcher</h1>
         </div>
         <div class="header-actions">
             <div class="membership-badge free" id="membership-badge">
@@ -753,124 +602,119 @@
         </div>
     </header>
 
-    <!-- Workspace -->
+    <!-- Workspace Grid -->
     <div class="workspace" id="workspace">
         
-        <!-- Left Side: PDF Viewer -->
-        <div class="doc-panel" id="doc-panel">
+        <!-- Left Side: Inputs -->
+        <div class="panel left-panel">
             <div class="panel-header">
-                <span>📄 문서 원본 파일</span>
-                <button class="toggle-viewer-btn" onclick="togglePdfViewer()"><i class="fa-solid fa-angles-left"></i> 닫기</button>
+                <span>📂 1. 채용 공고(JD) & 2. 내 이력서 적재</span>
             </div>
-            <div class="viewer-container">
-                <!-- Drop file placeholder -->
-                <div class="upload-placeholder" id="drop-zone">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <h4>분석할 파일을 이곳에 올려주세요</h4>
-                    <p>PDF, 이미지 및 마이크로소프트 오피스 파일을 드래그하거나 클릭하여 로드합니다.</p>
-                    <input type="file" id="file-input" accept=".pdf, .jpg, .jpeg, .png, .bmp, .tiff, .docx, .xlsx, .pptx, .html">
+            <div class="panel-content">
+                <!-- JD Upload -->
+                <div class="upload-container" style="flex: 1; display:flex; flex-direction:column; gap:0.5rem;">
+                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">기업 채용 공고 (Job Description PDF)</label>
+                    <div class="upload-box" id="jd-drop-zone" style="flex:1;">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <h4>공고 파일 업로드</h4>
+                        <p>JD PDF 또는 이미지 파일을 드롭하거나 <span>파일 선택</span></p>
+                        <input type="file" id="jd-file-input" accept=".pdf, .jpg, .jpeg, .png">
+                    </div>
+                    <div class="file-viewer-wrapper" id="jd-viewer-wrapper">
+                        <iframe id="jd-pdf-viewer"></iframe>
+                    </div>
                 </div>
-                <!-- Native Iframe Viewer for PDF -->
-                <iframe id="pdf-viewer"></iframe>
+
+                <!-- Resume Upload -->
+                <div class="upload-container" style="flex: 1; display:flex; flex-direction:column; gap:0.5rem;">
+                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">내 이력서 (Resume PDF)</label>
+                    <div class="upload-box" id="resume-drop-zone" style="flex:1;">
+                        <i class="fa-solid fa-file-user"></i>
+                        <h4>내 이력서 파일 업로드</h4>
+                        <p>이력서 PDF 파일을 드롭하거나 <span>파일 선택</span></p>
+                        <input type="file" id="resume-file-input" accept=".pdf">
+                    </div>
+                    <div class="file-viewer-wrapper" id="resume-viewer-wrapper">
+                        <iframe id="resume-pdf-viewer"></iframe>
+                    </div>
+                </div>
+
+                <!-- Analysis Trigger button -->
+                <button class="analyse-trigger-btn" id="analyse-btn" disabled onclick="runAtsMatching()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI 합격 가능성 진단 시작
+                </button>
             </div>
         </div>
 
-        <!-- Right Side: Analysis Panel -->
-        <div class="analysis-panel">
+        <!-- Right Side: Analysis Results -->
+        <div class="panel right-panel">
             <!-- Tabs Menu -->
             <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchTab(event, 'tab-chat')">
-                    <i class="fa-solid fa-comments"></i> AI 챗봇
+                <button class="tab-btn active" onclick="switchTab(event, 'tab-score')">
+                    <i class="fa-solid fa-chart-simple"></i> ATS 매칭 리포트
                 </button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-mindmap')">
-                    <i class="fa-solid fa-circle-nodes"></i> 구조 마인드맵
+                <button class="tab-btn" onclick="switchTab(event, 'tab-tailor')">
+                    <i class="fa-solid fa-pen-nib"></i> 이력서 교정 피드백 (Pro)
                 </button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-report')">
-                    <i class="fa-solid fa-file-invoice"></i> 비즈니스 보고서
+                <button class="tab-btn" onclick="switchTab(event, 'tab-interview')">
+                    <i class="fa-solid fa-comments-question"></i> 면접 질문 족보 맵 (Pro)
                 </button>
             </div>
 
-            <!-- Tab Content: Chat -->
-            <div class="tab-content active" id="tab-chat">
-                <div class="chat-container">
-                    <div class="messages-container" id="messages-container">
-                        <div class="message assistant">
-                            <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                            <div class="bubble">안녕하세요! 왼쪽에 분석하고 싶은 문서를 마우스로 끌어다 놓으세요. 분석 완료 후 RAG 기반으로 다양한 시각화와 보고서가 생성됩니다.</div>
+            <!-- Tab: Score (ATS Report) -->
+            <div class="tab-content active" id="tab-score">
+                <div class="empty-state" id="score-empty">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <p>공고문과 이력서를 왼쪽에 업로드하고 진단을 시작해 주세요.</p>
+                </div>
+                <div id="score-result-view" style="display: none; padding: 1rem 0;">
+                    <!-- Circular Score gauge -->
+                    <div class="score-circle-container">
+                        <div class="score-circle">
+                            <span class="number" id="match-score-num">0%</span>
+                            <span class="label">Matching Rate</span>
                         </div>
                     </div>
-                    
-                    <div class="suggestions" id="suggestions-area" style="display: none;">
-                        <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
-                            📝 핵심 내용 3줄 요약
-                        </div>
-                        <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
-                            🎯 주요 업무 및 자격 요건
-                        </div>
-                        <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
-                            🎁 우대사항 및 특이사항
-                        </div>
-                    </div>
-
-                    <div class="input-container">
-                        <div class="input-wrapper">
-                            <input type="text" id="chat-input" placeholder="문서에 관해 물어보세요..." disabled>
-                            <button class="send-btn" id="send-btn" disabled>
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </div>
+                    <!-- Analysis summary markdown viewer -->
+                    <div class="report-card">
+                        <h4><i class="fa-solid fa-list-check"></i> 종합 분석 및 키워드 매칭 요약</h4>
+                        <div class="marked-report" id="ats-text-report"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Content: Mindmap (Locked for Free Users) -->
-            <div class="tab-content" id="tab-mindmap">
-                <!-- Pro Lock Overlay -->
-                <div class="pro-lock-overlay" id="mindmap-lock" style="display: none;">
+            <!-- Tab: Tailor Resume (Locked for Free) -->
+            <div class="tab-content" id="tab-tailor">
+                <div class="pro-lock" id="tailor-lock">
                     <i class="fa-solid fa-lock"></i>
-                    <h3>구조 마인드맵 시각화</h3>
-                    <p>마인드맵 시각화 기능은 Pro 요금제 전용 기능입니다. 결제 후 발급받은 코드를 입력해 주세요.</p>
-                    <button class="action-btn" onclick="openUpgradeModal()"><i class="fa-solid fa-bolt" style="color:#fbbf24"></i> Pro 업그레이드</button>
+                    <h3>이력서 맞춤형 문장 교정</h3>
+                    <p>채용 공고 키워드에 최적화된 내 이력서 문장 수정 대안 피드백은 Pro 요금제 전용 기능입니다.</p>
+                    <button onclick="openUpgradeModal()"><i class="fa-solid fa-bolt"></i> Pro 라이선스 인증</button>
                 </div>
-
-                <div class="mindmap-container" id="mindmap-container">
-                    <div class="mindmap-actions" id="mindmap-actions" style="display: none;">
-                        <button class="action-btn" onclick="generateMindmap()">
-                            <i class="fa-solid fa-arrows-rotate"></i> 다시 생성
-                        </button>
-                    </div>
-                    <div class="mermaid-wrapper">
-                        <div class="mermaid" id="mermaid-render-area"></div>
-                    </div>
-                    <div class="empty-state" id="mindmap-empty">
-                        <i class="fa-solid fa-circle-nodes"></i>
-                        <p>문서 요약 분석 완료 후 마인드맵을 시각화할 수 있습니다.</p>
-                        <button class="action-btn" id="mindmap-gen-btn" disabled onclick="generateMindmap()">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> 마인드맵 생성
-                        </button>
-                    </div>
+                <div class="empty-state" id="tailor-empty">
+                    <i class="fa-solid fa-spell-check"></i>
+                    <p>진단을 시작하면 이력서 교정 가이드라인이 생성됩니다.</p>
+                </div>
+                <div class="report-card" id="tailor-result-view" style="display: none;">
+                    <h4><i class="fa-solid fa-pen-fancy"></i> 이력서 항목별 최적화 문장 수정안</h4>
+                    <div class="marked-report" id="tailor-text-report"></div>
                 </div>
             </div>
 
-            <!-- Tab Content: Report (Locked for Free Users) -->
-            <div class="tab-content" id="tab-report">
-                <!-- Pro Lock Overlay -->
-                <div class="pro-lock-overlay" id="report-lock" style="display: none;">
+            <!-- Tab: Interview Mindmap (Locked for Free) -->
+            <div class="tab-content" id="tab-interview">
+                <div class="pro-lock" id="interview-lock">
                     <i class="fa-solid fa-lock"></i>
-                    <h3>정형 보고서 요약</h3>
-                    <p>비즈니스 규격의 전문적인 보고서 요약본 생성은 Pro 요금제 전용 기능입니다.</p>
-                    <button class="action-btn" onclick="openUpgradeModal()"><i class="fa-solid fa-bolt" style="color:#fbbf24"></i> Pro 업그레이드</button>
+                    <h3>면접 예상 질문 족보 맵</h3>
+                    <p>내 이력서 기반으로 인사담당자가 반드시 질문할 면접 질문 5가지와 모범 답변 구조 마인드맵입니다.</p>
+                    <button onclick="openUpgradeModal()"><i class="fa-solid fa-bolt"></i> Pro 라이선스 인증</button>
                 </div>
-
-                <div class="report-container" id="report-container">
-                    <div class="empty-state" id="report-empty">
-                        <i class="fa-solid fa-file-invoice"></i>
-                        <p>문서의 핵심 정보들을 기반으로 비즈니스 보고서 초안을 빌드합니다.</p>
-                        <button class="action-btn" id="report-gen-btn" disabled onclick="generateReport()">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> 보고서 초안 생성
-                        </button>
-                    </div>
-                    <div class="report-view" id="report-view" style="display: none;"></div>
+                <div class="empty-state" id="interview-empty">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <p>진단을 시작하면 이력서 기반의 면접 족보 마인드맵이 시각화됩니다.</p>
+                </div>
+                <div class="mermaid-wrapper" id="interview-result-view" style="display: none; height: 100%;">
+                    <div class="mermaid" id="mermaid-render-area"></div>
                 </div>
             </div>
 
@@ -906,50 +750,38 @@
     </div>
 
     <script>
-        // Mermaid Initialization
+        // Mermaid Init
         mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
 
-        // Global State variables
-        let documentText = "";
-        let chatHistory = [];
-        let mindmapGenerated = false;
-        let reportGenerated = false;
-        
-        // Monetization limits
+        // App States
+        let jdText = "";
+        let resumeText = "";
         let isPro = localStorage.getItem('isProUser') === 'true';
         let uploadCount = parseInt(localStorage.getItem('userUploadCount') || '0');
-        let chatCount = 0;
-        const FREE_CHAT_LIMIT = 3;
 
         // UI Selectors
-        const workspace = document.getElementById('workspace');
-        const docPanel = document.getElementById('doc-panel');
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const appStatus = document.getElementById('app-status');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const messagesContainer = document.getElementById('messages-container');
-        const suggestionsArea = document.getElementById('suggestions-area');
-        
-        // Tab elements
-        const mindmapGenBtn = document.getElementById('mindmap-gen-btn');
-        const mindmapEmpty = document.getElementById('mindmap-empty');
-        const mindmapActions = document.getElementById('mindmap-actions');
-        const mermaidRenderArea = document.getElementById('mermaid-render-area');
-        const mindmapLock = document.getElementById('mindmap-lock');
+        const jdDropZone = document.getElementById('jd-drop-zone');
+        const jdFileInput = document.getElementById('jd-file-input');
+        const jdViewerWrapper = document.getElementById('jd-viewer-wrapper');
+        const jdPdfViewer = document.getElementById('jd-pdf-viewer');
 
-        const reportGenBtn = document.getElementById('report-gen-btn');
-        const reportEmpty = document.getElementById('report-empty');
-        const reportView = document.getElementById('report-view');
-        const reportLock = document.getElementById('report-lock');
+        const resumeDropZone = document.getElementById('resume-drop-zone');
+        const resumeFileInput = document.getElementById('resume-file-input');
+        const resumeViewerWrapper = document.getElementById('resume-viewer-wrapper');
+        const resumePdfViewer = document.getElementById('resume-pdf-viewer');
+
+        const btnAnalyse = document.getElementById('analyse-btn');
+        const appStatus = document.getElementById('app-status');
 
         // Membership Badge and Modal Controls
         const membershipBadge = document.getElementById('membership-badge');
         const openUpgradeBtn = document.getElementById('open-upgrade-btn');
         const upgradeModal = document.getElementById('upgrade-modal');
         const passcodeInput = document.getElementById('passcode-input');
+
+        // Feature lock elements
+        const tailorLock = document.getElementById('tailor-lock');
+        const interviewLock = document.getElementById('interview-lock');
 
         // Apply Premium State to UI
         const applyMembershipStatus = () => {
@@ -958,21 +790,20 @@
                 membershipBadge.innerHTML = `<i class="fa-solid fa-crown"></i> Pro Premium Active`;
                 openUpgradeBtn.style.display = "none";
                 
-                // Remove feature locks
-                mindmapLock.style.display = "none";
-                reportLock.style.display = "none";
+                // Hide feature locks
+                tailorLock.style.display = "none";
+                interviewLock.style.display = "none";
             } else {
                 membershipBadge.className = "membership-badge free";
                 membershipBadge.innerHTML = `<i class="fa-solid fa-seedling"></i> Free Plan (1일 1회 분석)`;
                 openUpgradeBtn.style.display = "block";
                 
-                // Show locks
-                mindmapLock.style.display = "flex";
-                reportLock.style.display = "flex";
+                // Show feature locks
+                tailorLock.style.display = "flex";
+                interviewLock.style.display = "flex";
             }
         };
 
-        // Modal triggers
         const openUpgradeModal = () => { upgradeModal.style.display = 'flex'; };
         const closeUpgradeModal = () => { upgradeModal.style.display = 'none'; };
         openUpgradeBtn.addEventListener('click', openUpgradeModal);
@@ -1005,12 +836,7 @@
             }
         };
 
-        // Toggle PDF View
-        const togglePdfViewer = () => {
-            workspace.classList.toggle('collapsed-pdf');
-        };
-
-        // Tab Switching Logic
+        // Tab Switcher
         const switchTab = (evt, tabId) => {
             const tablinks = document.getElementsByClassName("tab-btn");
             for (let i = 0; i < tablinks.length; i++) {
@@ -1020,281 +846,287 @@
             for (let i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].classList.remove("active");
             }
-
             evt.currentTarget.classList.add("active");
             document.getElementById(tabId).classList.add("active");
+        };
 
-            if (tabId !== 'tab-chat' && workspace.classList.contains('collapsed-pdf')) {
-                workspace.classList.remove('collapsed-pdf');
+        // Drag/Drop for JD
+        jdDropZone.addEventListener('click', () => jdFileInput.click());
+        jdDropZone.addEventListener('dragover', (e) => { e.preventDefault(); jdDropZone.classList.add('dragover'); });
+        jdDropZone.addEventListener('dragleave', () => { jdDropZone.classList.remove('dragover'); });
+        jdDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            jdDropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) handleJdFile(e.dataTransfer.files[0]);
+        });
+        jdFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleJdFile(e.target.files[0]);
+        });
+
+        // Drag/Drop for Resume
+        resumeDropZone.addEventListener('click', () => resumeFileInput.click());
+        resumeDropZone.addEventListener('dragover', (e) => { e.preventDefault(); resumeDropZone.classList.add('dragover'); });
+        resumeDropZone.addEventListener('dragleave', () => { resumeDropZone.classList.remove('dragover'); });
+        resumeDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            resumeDropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) handleResumeFile(e.dataTransfer.files[0]);
+        });
+        resumeFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleResumeFile(e.target.files[0]);
+        });
+
+        // OCR Core parser function
+        const callOcrApi = async (file) => {
+            const fileBytes = await file.arrayBuffer();
+            const response = await fetch("/api/ocr", {
+                method: 'POST',
+                body: fileBytes
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "OCR 분석 실패");
+            return result.content || "";
+        };
+
+        // File Handler: JD
+        const handleJdFile = async (file) => {
+            appStatus.className = "app-status loading";
+            appStatus.innerHTML = `<i class="fa-solid fa-circle-notch"></i> <span>상태: 공고문 OCR 분석 중...</span>`;
+            
+            if (file.type === "application/pdf") {
+                jdPdfViewer.src = URL.createObjectURL(file);
+                jdViewerWrapper.style.display = "block";
+                jdDropZone.style.display = "none";
+            }
+
+            try {
+                jdText = await callOcrApi(file);
+                appStatus.className = "app-status success";
+                appStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>상태: 공고 분석 완료</span>`;
+                checkAnalyseCondition();
+            } catch (err) {
+                console.error(err);
+                appStatus.className = "app-status";
+                appStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color)"></i> <span>상태: 분석 실패</span>`;
+                alert(err.message);
             }
         };
 
-        // File Uploader Drag/Drop
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-        });
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) handleFile(e.target.files[0]);
-        });
-
-        // OCR Handler with upload limits
-        const handleFile = async (file) => {
-            // 무료 사용자 업로드 한도 검증 (하루 1회 제한)
+        // File Handler: Resume
+        const handleResumeFile = async (file) => {
+            // 무료 사용자 분석 제한 (하루 1회 제한)
             if (!isPro && uploadCount >= 1) {
-                alert("⚠️ 무료 체험 1일 1회 분석 한도를 초과했습니다. Pro 라이선스를 구매해 제한을 해제하세요!");
+                alert("⚠️ 무료 체험 1일 1회 분석 한도를 초과했습니다. Pro 라이선스를 등록하고 무제한 이력서 진단을 받아보세요!");
                 openUpgradeModal();
                 return;
             }
 
             appStatus.className = "app-status loading";
-            appStatus.innerHTML = `<i class="fa-solid fa-circle-notch"></i> <span>상태: 문서 OCR 분석 중...</span>`;
+            appStatus.innerHTML = `<i class="fa-solid fa-circle-notch"></i> <span>상태: 이력서 OCR 분석 중...</span>`;
             
             if (file.type === "application/pdf") {
-                const fileURL = URL.createObjectURL(file);
-                pdfViewer.src = fileURL;
-                pdfViewer.style.display = "block";
-                dropZone.style.display = "none";
+                resumePdfViewer.src = URL.createObjectURL(file);
+                resumeViewerWrapper.style.display = "block";
+                resumeDropZone.style.display = "none";
             }
 
             try {
-                const fileBytes = await file.arrayBuffer();
+                resumeText = await callOcrApi(file);
+                appStatus.className = "app-status success";
+                appStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>상태: 이력서 분석 완료</span>`;
+                checkAnalyseCondition();
+            } catch (err) {
+                console.error(err);
+                appStatus.className = "app-status";
+                appStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color)"></i> <span>상태: 분석 실패</span>`;
+                alert(err.message);
+            }
+        };
 
-                const ocrResponse = await fetch("/api/ocr", {
+        // Check if both files are successfully parsed
+        const checkAnalyseCondition = () => {
+            if (jdText && resumeText) {
+                btnAnalyse.disabled = false;
+            }
+        };
+
+        // Run ATS Matching (Triggers AI analysis on right side tabs)
+        const runAtsMatching = async () => {
+            if (!jdText || !resumeText) return;
+
+            appStatus.className = "app-status loading";
+            appStatus.innerHTML = `<i class="fa-solid fa-circle-notch"></i> <span>상태: AI 매칭 진단 작동 중...</span>`;
+            btnAnalyse.disabled = true;
+
+            // 1. ATS Score & Summary API Call (Free Feature)
+            try {
+                const scorePrompt = `너는 글로벌 대기업의 채용 시스템인 ATS(지원자 추적 시스템) 채용담당 비서이다.
+제공된 [채용 공고(JD)]와 [지원자 이력서]를 비교 분석하여 아래 지침을 채워 리포트를 발행해 주세요.
+
+1. 매칭 스코어 산출:
+- 직무 적합도, 필수 기술 일치도 등을 반영한 매칭률(0% ~ 100% 정수형)을 산출하고, 대답 첫 줄에 반드시 "SCORE: [숫자]" 양식으로 작성해 주세요. (예: SCORE: 78)
+
+2. 분석 요약 보고서 작성:
+- 이력서에 반드시 보완해야 할 '누락된 핵심 직무 키워드' 리스트
+- 이력서 상의 '직무 연관성 강점 및 약점' 분석 리포트
+
+[채용 공고(JD)]
+${jdText}
+
+[지원자 이력서]
+${resumeText}`;
+
+                const response = await fetch("/api/chat", {
                     method: 'POST',
-                    body: fileBytes
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "system", content: "당신은 대기업 채용용 ATS 매칭 스코어 요약 분석 전문가입니다." },
+                            { role: "user", content: scorePrompt }
+                        ]
+                    })
                 });
 
-                const ocrResult = await ocrResponse.json();
+                const resData = await response.json();
+                if (!response.ok) throw new Error(resData.error);
 
-                if (!ocrResponse.ok) throw new Error(ocrResult.error || "OCR 실패");
+                const rawScoreReport = resData.choices[0].message.content;
 
-                documentText = ocrResult.content || "";
+                // Parse Score
+                const scoreMatch = rawScoreReport.match(/SCORE:\s*(\d+)/i);
+                const scoreVal = scoreMatch ? scoreMatch[1] : "0";
+                
+                // Remove SCORE line from output rendering text
+                const cleanedReport = rawScoreReport.replace(/SCORE:\s*\d+/i, "").trim();
 
-                // Increment upload count only on successful parse
+                // Update UI elements
+                document.getElementById('match-score-num').innerText = `${scoreVal}%`;
+                
+                // Color code the score border
+                const scoreCircle = document.querySelector('.score-circle');
+                if (parseInt(scoreVal) >= 80) scoreCircle.style.borderColor = "var(--success-color)";
+                else if (parseInt(scoreVal) >= 50) scoreCircle.style.borderColor = "var(--warning-color)";
+                else scoreCircle.style.borderColor = "var(--danger-color)";
+
+                document.getElementById('ats-text-report').innerHTML = marked.parse(cleanedReport);
+                
+                document.getElementById('score-empty').style.display = "none";
+                document.getElementById('score-result-view').style.display = "block";
+
+                // Increment free count
                 if (!isPro) {
                     uploadCount++;
                     localStorage.setItem('userUploadCount', uploadCount.toString());
                 }
 
                 appStatus.className = "app-status success";
-                appStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>상태: 분석 완료 (${documentText.length} 자)</span>`;
+                appStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>상태: ATS 진단 완료</span>`;
 
-                chatInput.disabled = false;
-                sendBtn.disabled = false;
-                suggestionsArea.style.display = "flex";
-
-                mindmapGenBtn.disabled = false;
-                reportGenBtn.disabled = false;
-
-                addMessage("assistant", `문서 분석이 완료되었습니다! 챗봇에 문서 내용을 질문해 보세요.`);
-
-            } catch (err) {
-                console.error(err);
-                appStatus.className = "app-status";
-                appStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color)"></i> <span>오류: 분석 실패</span>`;
-                alert(`오류 발생: ${err.message}`);
-            }
-        };
-
-        // Chat UI & Logic with Chat limits
-        const askQuestion = async (userQuery) => {
-            if (!documentText) return alert("먼저 파일을 업로드해 주세요.");
-
-            // 무료 유저 질문 횟수 제한 검증
-            if (!isPro && chatCount >= FREE_CHAT_LIMIT) {
-                alert("⚠️ 무료 버전은 질문 3회만 가능합니다. 무제한 대화와 마인드맵/보고서 생성을 위해 Pro로 업그레이드해 보세요!");
-                openUpgradeModal();
-                return;
-            }
-
-            addMessage("user", userQuery);
-            chatHistory.push({ role: "user", content: userQuery });
-            
-            chatInput.value = "";
-            chatInput.disabled = true;
-            sendBtn.disabled = true;
-
-            const loadingMsgDiv = document.createElement('div');
-            loadingMsgDiv.className = 'message assistant';
-            loadingMsgDiv.innerHTML = `
-                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                <div class="bubble"><i class="fa-solid fa-circle-notch spinner"></i> 답변을 구성하는 중...</div>
-            `;
-            messagesContainer.appendChild(loadingMsgDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            try {
-                const systemPrompt = `당신은 제공된 문서를 바탕으로 사용자의 질문에 답하는 비서입니다.
-아래 [참조 문서 내용]을 바탕으로 사용자의 질문에 친절하고 상세하게 답변해 주세요.
-
-[답변 규칙]
-1. 반드시 한국어로 답변해 주세요.
-2. 문서에 명시되지 않은 정보는 억지로 지어내지 말고, 솔직하게 "제공된 문서 내용에서는 해당 정보를 찾을 수 없습니다."라고 답변해 주세요.
-3. 문서의 텍스트에 기반하여 팩트 위주로 대답해 주세요.
-
-[참조 문서 내용]
-${documentText}`;
-
-                const messagesPayload = [{ role: "system", content: systemPrompt }];
-                const lastHistory = chatHistory.slice(-6);
-                lastHistory.forEach(h => messagesPayload.push(h));
-
-                const response = await fetch("/api/chat", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: messagesPayload })
-                });
-
-                const resData = await response.json();
-                if (!response.ok) throw new Error(resData.error || "AI 호출 오류");
-
-                const aiAnswer = resData.choices[0].message.content;
-                messagesContainer.removeChild(loadingMsgDiv);
-                addMessage("assistant", aiAnswer);
-                chatHistory.push({ role: "assistant", content: aiAnswer });
-
-                // Increment Free Chat Count
-                if (!isPro) {
-                    chatCount++;
+                // If user is Pro, automatically build Pro features too
+                if (isPro) {
+                    buildProFeatures();
                 }
 
             } catch (err) {
                 console.error(err);
-                messagesContainer.removeChild(loadingMsgDiv);
-                addMessage("assistant", `오류가 발생했습니다: ${err.message}`);
-            } finally {
-                chatInput.disabled = false;
-                sendBtn.disabled = false;
-                chatInput.focus();
+                appStatus.className = "app-status";
+                appStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color)"></i> <span>상태: 진단 에러</span>`;
+                alert(err.message);
+                btnAnalyse.disabled = false;
             }
         };
 
-        window.askSuggestion = (fullText) => {
-            const cleanText = fullText.replace(/^[^\w가-힣]+/, "").trim();
-            askQuestion(cleanText);
-        };
-
-        sendBtn.addEventListener('click', () => {
-            const query = chatInput.value.trim();
-            if (query) askQuestion(query);
-        });
-
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                const query = chatInput.value.trim();
-                if (query) askQuestion(query);
-            }
-        });
-
-        // 🌿 Mindmap Generation
-        const generateMindmap = async () => {
-            if (!isPro) return openUpgradeModal();
-            if (!documentText) return;
-
-            mindmapEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>구조 마인드맵 그리는 중...</p>`;
-            mindmapGenBtn.disabled = true;
+        // Pro Features Builder (Tailor text & Interview mindmap)
+        const buildProFeatures = async () => {
+            // Build 1. Tailor Resume Markdown
+            const tailorEmpty = document.getElementById('tailor-empty');
+            const tailorResultView = document.getElementById('tailor-result-view');
+            const tailorTextReport = document.getElementById('tailor-text-report');
+            
+            tailorEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem"></i><p>이력서 교정 문장 작성 중...</p>`;
 
             try {
-                const mindmapPrompt = `제공된 문서 내용을 기반으로 핵심 정보를 구조화한 Mermaid.js 마인드맵(mindmap) 코드를 생성해 주세요.
-반드시 마인드맵 코드만 출력해야 하며, 다른 설명글이나 마크다운 펜스 등은 일절 적지 마세요.
+                const tailorPrompt = `너는 글로벌 취업 첨삭 전문 컨설턴트다.
+제공된 [채용 공고]에 명시된 필수 조건에 맞춰 [이력서]의 특정 항목 문장을 어떻게 교정하여 수정해야 할지, 실제 '수정 전' ➡️ '수정 후' 대비 문장을 표(Table)나 포맷으로 5문장 이상 상세하게 한국어/영어 교정안을 작성해 주세요.
 
-[문서 내용]
-${documentText}
+[채용 공고]
+${jdText}
 
-mindmap
-  root((핵심 주제))`;
+[이력서]
+${resumeText}`;
 
-                const response = await fetch("/api/chat", {
+                const res = await fetch("/api/chat", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages: [
-                            { role: "system", content: "당신은 구조 시각화용 Mermaid 마인드맵 코드 자동 작성기입니다." },
+                            { role: "system", content: "당신은 채용 공고 맞춤형 이력서 교정 문장 작성 전문가입니다." },
+                            { role: "user", content: tailorPrompt }
+                        ]
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                tailorTextReport.innerHTML = marked.parse(data.choices[0].message.content);
+                tailorEmpty.style.display = "none";
+                tailorResultView.style.display = "block";
+
+            } catch (err) {
+                tailorEmpty.innerHTML = `<p style="color:var(--danger-color)">교정 실패: ${err.message}</p>`;
+            }
+
+            // Build 2. Interview Mindmap (Mermaid graph)
+            const interviewEmpty = document.getElementById('interview-empty');
+            const interviewResultView = document.getElementById('interview-result-view');
+            const mermaidRenderArea = document.getElementById('mermaid-render-area');
+
+            interviewEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem"></i><p>면접 질문 마인드맵 그리는 중...</p>`;
+
+            try {
+                const mindmapPrompt = `제공된 [채용 공고]와 [이력서]를 바탕으로, 실제 면접에 들어갔을 때 면접관이 반드시 질문할 면접 질문 5가지와, 각 질문별 지원자가 가져가야 할 모범 답변 핵심 키워드 구조를 계층화된 Mermaid.js 마인드맵(mindmap) 포맷으로 구성해 주세요.
+반드시 마인드맵 코드만 출력하고, 다른 부가 설명글은 적지 마세요.
+
+[채용 공고]
+${jdText}
+
+[이력서]
+${resumeText}
+
+mindmap
+  root((면접 질문 족보))`
+
+                const res = await fetch("/api/chat", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "system", content: "당신은 면접 질문 구조 마인드맵 코드 작성 전문가입니다." },
                             { role: "user", content: mindmapPrompt }
                         ]
                     })
                 });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
 
-                const resData = await response.json();
-                if (!response.ok) throw new Error(resData.error);
-
-                let rawMermaidCode = resData.choices[0].message.content.trim();
-                rawMermaidCode = rawMermaidCode.replace(/```mermaid/gi, "").replace(/```/g, "").trim();
+                let rawMermaid = data.choices[0].message.content.trim();
+                rawMermaid = rawMermaid.replace(/```mermaid/gi, "").replace(/```/g, "").trim();
 
                 mermaidRenderArea.innerHTML = "";
                 mermaidRenderArea.removeAttribute('data-processed');
-                
-                const { svg } = await mermaid.render('mindmap-svg', rawMermaidCode);
+
+                const { svg } = await mermaid.render('mindmap-svg', rawMermaid);
                 mermaidRenderArea.innerHTML = svg;
 
-                mindmapEmpty.style.display = "none";
-                mindmapActions.style.display = "flex";
-                mindmapGenerated = true;
+                interviewEmpty.style.display = "none";
+                interviewResultView.style.display = "flex";
 
             } catch (err) {
-                console.error(err);
-                mindmapEmpty.innerHTML = `
-                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color); font-size:3rem;"></i>
-                    <p>마인드맵 시각화에 실패했습니다: ${err.message}</p>
-                    <button class="action-btn" onclick="generateMindmap()"><i class="fa-solid fa-arrows-rotate"></i> 다시 시도</button>
-                `;
+                interviewEmpty.innerHTML = `<p style="color:var(--danger-color)">마인드맵 빌드 실패: ${err.message}</p>`;
             }
         };
 
-        // 📋 Report Generation
-        const generateReport = async () => {
-            if (!isPro) return openUpgradeModal();
-            if (!documentText) return;
-
-            reportEmpty.innerHTML = `<i class="fa-solid fa-circle-notch spinner" style="font-size:3rem;"></i><p>보고서 생성 중...</p>`;
-            reportGenBtn.disabled = true;
-
-            try {
-                const reportPrompt = `제공된 문서의 내용을 격식 있고 전문적인 비즈니스 보고서(Markdown 형식)로 완전하게 재구성해 주세요.
-- 1. 개요 및 목적, 2. 핵심 분석 요약, 3. 결론 및 향후 전망 순으로 작성해 주세요.
-- 표나 리스트를 적극 활용해 주세요.
-
-[문서 내용]
-${documentText}`;
-
-                const response = await fetch("/api/chat", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: [
-                            { role: "system", content: "당신은 전문적인 비즈니스 보고서 작성 컨설턴트입니다." },
-                            { role: "user", content: reportPrompt }
-                        ]
-                    })
-                });
-
-                const resData = await response.json();
-                if (!response.ok) throw new Error(resData.error);
-
-                const rawReportMarkdown = resData.choices[0].message.content;
-                reportView.innerHTML = marked.parse(rawReportMarkdown);
-                
-                reportEmpty.style.display = "none";
-                reportView.style.display = "block";
-                reportGenerated = true;
-
-            } catch (err) {
-                console.error(err);
-                reportEmpty.innerHTML = `
-                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger-color); font-size:3rem;"></i>
-                    <p>보고서 생성에 실패했습니다: ${err.message}</p>
-                    <button class="action-btn" onclick="generateReport()"><i class="fa-solid fa-arrows-rotate"></i> 다시 시도</button>
-                `;
-            }
-        };
-
-        // Initialize Membership UI on page load
+        // Initialize Membership status on load
         applyMembershipStatus();
     </script>
 </body>
