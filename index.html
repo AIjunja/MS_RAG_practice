@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 RAG 문서 업로더 & 챗봇</title>
+    <!-- Google Fonts & Icon -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+        }
+
+        /* Header Styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 15, 25, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-area i {
+            font-size: 1.75rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        .logo-area h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Layout Grid */
+        .container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            flex: 1;
+            height: calc(100vh - 65px);
+            overflow: hidden;
+        }
+
+        /* Sidebar (Left) */
+        .sidebar {
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: rgba(17, 24, 39, 0.3);
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+        }
+
+        .sidebar-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* File Upload Styling */
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 0.75rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--accent-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        .upload-area:hover i {
+            color: var(--accent-color);
+        }
+
+        .upload-area p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .upload-area span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Status & OCR text preview */
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        .status-badge.success {
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.loading {
+            color: var(--accent-color);
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .ocr-preview-container {
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Main Chat Area (Right) */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .message.user .avatar {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .message.assistant .avatar {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            border: none;
+        }
+
+        .bubble {
+            padding: 0.85rem 1.25rem;
+            border-radius: 1.25rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .message.user .bubble {
+            background: var(--accent-color);
+            color: white;
+            border-top-right-radius: 0.25rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .message.assistant .bubble {
+            background: var(--panel-bg);
+            color: var(--text-primary);
+            border-top-left-radius: 0.25rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Suggestions Area */
+        .suggestions {
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-primary);
+            border-color: var(--accent-color);
+        }
+
+        /* Input Area */
+        .input-container {
+            padding: 1.5rem 2rem 2rem;
+            background: transparent;
+        }
+
+        .input-wrapper {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent-color);
+        }
+
+        #chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            resize: none;
+            max-height: 100px;
+            min-height: 24px;
+        }
+
+        #chat-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: #111827;
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            width: 500px;
+            max-width: 90%;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close-modal-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .save-settings-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .save-settings-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <i class="fa-solid fa-file-invoice"></i>
+            <h1>RAG OCR Chatbot</h1>
+        </div>
+        <button class="settings-btn" id="open-settings-btn">
+            <i class="fa-solid fa-gear"></i>
+            API 설정
+        </button>
+    </header>
+
+    <!-- App Body -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Upload Card -->
+            <div class="sidebar-card">
+                <h3><i class="fa-solid fa-cloud-arrow-up"></i> 문서 업로드</h3>
+                <div class="upload-area" id="drop-zone">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <p>분석할 문서를 드래그 앤 드롭 하거나 <span>파일 선택</span>을 클릭하세요.</p>
+                    <input type="file" id="file-input" accept=".pdf, .jpg, .jpeg, .png, .bmp, .tiff, .docx, .xlsx, .pptx, .html">
+                </div>
+                
+                <!-- OCR Status -->
+                <div class="status-badge" id="ocr-status-badge">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>대기 중 (문서를 업로드하세요)</span>
+                </div>
+            </div>
+
+            <!-- OCR Text Preview Card -->
+            <div class="sidebar-card" id="preview-card" style="display: none;">
+                <h3><i class="fa-solid fa-file-text"></i> 추출된 텍스트 원본</h3>
+                <div class="ocr-preview-container" id="ocr-text-preview"></div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <!-- Messages -->
+            <div class="messages-container" id="messages-container">
+                <div class="message assistant">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bubble">안녕하세요! 문서를 업로드해 주시면 내용을 분석하여 RAG 기반으로 답변해 드립니다. 먼저 오른쪽 위 'API 설정' 버튼을 눌러 자격 증명을 설정해 주세요.</div>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div class="suggestions" id="suggestions-area" style="display: none;">
+                <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 📝 문서 핵심 내용을 3줄로 요약해 줘
+                </div>
+                <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 🎯 주요 업무와 핵심 지원 자격 요건은 뭐야?
+                </div>
+                <div class="suggestion-chip" onclick="askSuggestion(this.innerText)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 🎁 우대사항 및 복지 혜택 같은 특이사항이 있어?
+                </div>
+            </div>
+
+            <!-- Input Container -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input type="text" id="chat-input" placeholder="문서에 관해 물어보세요..." disabled>
+                    <button class="send-btn" id="send-btn" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>⚙️ API 자격 증명 설정</h2>
+                <button class="close-modal-btn" id="close-settings-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="form-group">
+                <label>Azure OCR (Document Intelligence) Endpoint</label>
+                <input type="text" id="cfg-ocr-endpoint" placeholder="https://your-ocr-resource.cognitiveservices.azure.com/">
+            </div>
+            <div class="form-group">
+                <label>Azure OCR API Key</label>
+                <input type="password" id="cfg-ocr-key" placeholder="OCR 구독 키">
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+            
+            <div class="form-group">
+                <label>Azure OpenAI Endpoint</label>
+                <input type="text" id="cfg-openai-endpoint" placeholder="https://your-openai-resource.openai.azure.com/">
+            </div>
+            <div class="form-group">
+                <label>Azure OpenAI API Key</label>
+                <input type="password" id="cfg-openai-key" placeholder="OpenAI API 키">
+            </div>
+            <div class="form-group">
+                <label>Azure OpenAI Deployment Name (배포명)</label>
+                <input type="text" id="cfg-openai-deployment" placeholder="예: gpt-4o, gpt-5 등">
+            </div>
+            <div class="form-group">
+                <label>Azure OpenAI API Version</label>
+                <input type="text" id="cfg-openai-version" value="2024-02-01">
+            </div>
+
+            <button class="save-settings-btn" id="save-settings-btn">설정 저장 및 적용</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const openSettingsBtn = document.getElementById('open-settings-btn');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const ocrStatusBadge = document.getElementById('ocr-status-badge');
+        const ocrTextPreview = document.getElementById('ocr-text-preview');
+        const previewCard = document.getElementById('preview-card');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const messagesContainer = document.getElementById('messages-container');
+        const suggestionsArea = document.getElementById('suggestions-area');
+
+        // Global App State
+        let documentText = "";
+        let chatHistory = [];
+
+        // Load Settings from LocalStorage
+        const getSettings = () => {
+            return {
+                ocrEndpoint: localStorage.getItem('ocrEndpoint') || '',
+                ocrKey: localStorage.getItem('ocrKey') || '', // 기본값 제거 및 공란 처리
+                openaiEndpoint: localStorage.getItem('openaiEndpoint') || '',
+                openaiKey: localStorage.getItem('openaiKey') || '',
+                openaiDeployment: localStorage.getItem('openaiDeployment') || '',
+                openaiVersion: localStorage.getItem('openaiVersion') || '2024-02-01'
+            };
+        };
+
+        // Initialize Settings Modal Inputs
+        const initSettingsModal = () => {
+            const s = getSettings();
+            document.getElementById('cfg-ocr-endpoint').value = s.ocrEndpoint;
+            document.getElementById('cfg-ocr-key').value = s.ocrKey;
+            document.getElementById('cfg-openai-endpoint').value = s.openaiEndpoint;
+            document.getElementById('cfg-openai-key').value = s.openaiKey;
+            document.getElementById('cfg-openai-deployment').value = s.openaiDeployment;
+            document.getElementById('cfg-openai-version').value = s.openaiVersion;
+        };
+
+        // Modal Open/Close Event
+        openSettingsBtn.addEventListener('click', () => {
+            initSettingsModal();
+            settingsModal.style.display = 'flex';
+        });
+
+        const closeModal = () => { settingsModal.style.display = 'none'; };
+        closeSettingsBtn.addEventListener('click', closeModal);
+        settingsModal.addEventListener('click', (e) => { if(e.target === settingsModal) closeModal(); });
+
+        // Save Settings Event
+        saveSettingsBtn.addEventListener('click', () => {
+            localStorage.setItem('ocrEndpoint', document.getElementById('cfg-ocr-endpoint').value.trim());
+            localStorage.setItem('ocrKey', document.getElementById('cfg-ocr-key').value.trim());
+            localStorage.setItem('openaiEndpoint', document.getElementById('cfg-openai-endpoint').value.trim());
+            localStorage.setItem('openaiKey', document.getElementById('cfg-openai-key').value.trim());
+            localStorage.setItem('openaiDeployment', document.getElementById('cfg-openai-deployment').value.trim());
+            localStorage.setItem('openaiVersion', document.getElementById('cfg-openai-version').value.trim());
+            
+            closeModal();
+            alert("설정이 안전하게 저장되었습니다! (브라우저 로컬 스토리지에만 저장됩니다)");
+        });
+
+        // File Uploader Handling
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // OCR Core Process (Azure Document Intelligence REST API calls)
+        const handleFile = async (file) => {
+            const settings = getSettings();
+            if (!settings.ocrEndpoint || !settings.ocrKey) {
+                alert("Azure OCR 설정 정보를 입력해 주세요.");
+                openSettingsBtn.click();
+                return;
+            }
+
+            // Set loading UI
+            ocrStatusBadge.className = "status-badge loading";
+            ocrStatusBadge.innerHTML = `<i class="fa-solid fa-circle-notch spinner"></i> <span>OCR 분석 중...</span>`;
+            
+            try {
+                // Read File Buffer
+                const fileBytes = await file.arrayBuffer();
+
+                // REST API URL 설정
+                let endpointClean = settings.ocrEndpoint.replace(/\/$/, "");
+                const ocrUrl = `${endpointClean}/documentintelligence/documentModels/prebuilt-read:analyze?api-version=2024-02-29-preview`;
+
+                // 1. Submit Document (POST)
+                const submitResponse = await fetch(ocrUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': settings.ocrKey,
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    body: fileBytes
+                });
+
+                if (!submitResponse.ok) {
+                    throw new Error(`Azure OCR 제출 실패: ${submitResponse.statusText}`);
+                }
+
+                // 2. Get Operation Location from Header
+                const operationLocation = submitResponse.headers.get('Operation-Location');
+                if (!operationLocation) {
+                    throw new Error("분석 작업 위치(Operation-Location)를 찾을 수 없습니다.");
+                }
+
+                // 3. Status Polling loop (GET)
+                let status = "notStarted";
+                let resultData = null;
+                const startTime = Date.now();
+
+                while (status !== "succeeded" && status !== "failed") {
+                    // 최대 2분 대기 제한
+                    if (Date.now() - startTime > 120000) {
+                        throw new Error("시간 초과: OCR 요청 시간이 2분을 경과했습니다.");
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // 2초 대기
+
+                    const statusResponse = await fetch(operationLocation, {
+                        headers: {
+                            'Ocp-Apim-Subscription-Key': settings.ocrKey
+                        }
+                    });
+
+                    if (!statusResponse.ok) {
+                        throw new Error(`상태 조회 실패: ${statusResponse.statusText}`);
+                    }
+
+                    resultData = await statusResponse.json();
+                    status = resultData.status;
+
+                    if (status === "failed") {
+                        throw new Error("Azure OCR 분석에 실패했습니다.");
+                    }
+                }
+
+                // 4. Success parsing
+                documentText = resultData.analyzeResult.content || "";
+                
+                // Update UI
+                ocrStatusBadge.className = "status-badge success";
+                ocrStatusBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>문서 분석 완료! (${documentText.length} 자)</span>`;
+                
+                ocrTextPreview.innerText = documentText;
+                previewCard.style.display = "flex";
+                suggestionsArea.style.display = "flex";
+                
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                
+                addMessage("assistant", "문서가 성공적으로 준비되었습니다! 추천 질문을 클릭하거나 아래 입력창에 문서에 관해 물어보세요.");
+
+            } catch (err) {
+                console.error(err);
+                ocrStatusBadge.className = "status-badge";
+                ocrStatusBadge.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:var(--danger-color)"></i> <span>에러: ${err.message}</span>`;
+                alert(`오류 발생: ${err.message}`);
+            }
+        };
+
+        // Chat UI helpers
+        const addMessage = (role, text) => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerHTML = role === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerText = text;
+            
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+            
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        };
+
+        // Action Trigger for LLM Question-Answering
+        const askQuestion = async (userQuery) => {
+            const settings = getSettings();
+            if (!settings.openaiEndpoint || !settings.openaiKey || !settings.openaiDeployment) {
+                alert("Azure OpenAI 설정 정보(사이드바/설정)를 채워 넣어주세요.");
+                openSettingsBtn.click();
+                return;
+            }
+
+            if (!documentText) {
+                alert("먼저 문서를 올려주세요.");
+                return;
+            }
+
+            // UI 갱신 및 히스토리 보관
+            addMessage("user", userQuery);
+            chatHistory.push({ role: "user", content: userQuery });
+            
+            chatInput.value = "";
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // 로딩 대기 메시지
+            const loadingMsgDiv = document.createElement('div');
+            loadingMsgDiv.className = 'message assistant';
+            loadingMsgDiv.innerHTML = `
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="bubble"><i class="fa-solid fa-circle-notch spinner"></i> 답변을 생각하는 중...</div>
+            `;
+            messagesContainer.appendChild(loadingMsgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                // OpenAI API End Point 구성
+                let endpointClean = settings.openaiEndpoint.replace(/\/$/, "");
+                const aiUrl = `${endpointClean}/openai/deployments/${settings.openaiDeployment}/chat/completions?api-version=${settings.openaiVersion}`;
+
+                // RAG System Prompt 구성
+                const systemPrompt = `당신은 제공된 문서를 바탕으로 사용자의 질문에 답하는 비서입니다.
+아래 [참조 문서 내용]을 바탕으로 사용자의 질문에 친절하고 상세하게 답변해 주세요.
+
+[답변 규칙]
+1. 반드시 한국어로 답변해 주세요.
+2. 문서에 명시되지 않은 정보는 억지로 지어내지 말고, 솔직하게 "제공된 문서 내용에서는 해당 정보를 찾을 수 없습니다."라고 답변해 주세요.
+3. 문서의 텍스트에 기반하여 팩트 위주로 대답해 주세요.
+
+[참조 문서 내용]
+${documentText}`;
+
+                // 대화 데이터 배열 만들기 (최근 6개 히스토리만 결합)
+                const messagesPayload = [
+                    { role: "system", content: systemPrompt }
+                ];
+                
+                const lastHistory = chatHistory.slice(-6);
+                lastHistory.forEach(h => messagesPayload.push(h));
+
+                // 호출
+                const response = await fetch(aiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'api-key': settings.openaiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: messagesPayload
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`OpenAI 호출 실패: ${response.statusText}`);
+                }
+
+                const resData = await response.json();
+                const aiAnswer = resData.choices[0].message.content;
+
+                // Remove loading bubble
+                messagesContainer.removeChild(loadingMsgDiv);
+                
+                // Add real answer
+                addMessage("assistant", aiAnswer);
+                chatHistory.push({ role: "assistant", content: aiAnswer });
+
+            } catch (err) {
+                console.error(err);
+                messagesContainer.removeChild(loadingMsgDiv);
+                addMessage("assistant", `오류가 발생했습니다: ${err.message}`);
+            } finally {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+            }
+        };
+
+        // Suggested Question callback
+        window.askSuggestion = (fullText) => {
+            // 버튼 아이콘 및 이모티콘 떼고 텍스트만 전송
+            const cleanText = fullText.replace(/^[^\w가-힣]+/, "").trim();
+            askQuestion(cleanText);
+        };
+
+        // User Chat submit event listeners
+        sendBtn.addEventListener('click', () => {
+            const query = chatInput.value.trim();
+            if (query) askQuestion(query);
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const query = chatInput.value.trim();
+                if (query) askQuestion(query);
+            }
+        });
+
+        // Initialize Settings Modal on page load
+        initSettingsModal();
+    </script>
+</body>
+</html>
